@@ -1,0 +1,13 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --color-bg: #293251;
+    --color-gold: #d2bf55;
+    --color-light: #f3e8ee;
+    --color-blue: #568ea3;
+    --color-red: #b23a48;
+}
