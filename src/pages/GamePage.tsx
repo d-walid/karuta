@@ -106,7 +106,7 @@ export default function GamePage() {
                 >
                     {allCards.length === 0 ? 'Loading...' : 'Start the game'}
                 </button>
-                
+
                 <div className={styles.info}>
                     <span>Theme : Anime</span>
                     <span>{ROUND_COUNT} musics - {ROUND_COUNT * 2} cards</span>
