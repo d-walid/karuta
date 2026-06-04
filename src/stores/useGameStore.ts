@@ -41,6 +41,7 @@ type GameStore = GameState & {
     handleExpire: () => void
     setVolume: (value: number) => void
     setLocked: (value: boolean) => void
+    resetGame: () => void
 }
 
 
@@ -174,6 +175,17 @@ export const useGameStore = create<GameStore>()(
             // Updates the global audio volume of the music
             setVolume: (value) => set({ volume: value }),
             setLocked: (value) => set({ isLocked: value }),
+
+            resetGame: () => set({
+                status: 'idle',
+                rounds: [],
+                currentRoundIndex: 0,
+                score: 0,
+                errors: 0,
+                cardStatuses: {},
+                shuffledCards: [],
+                isLocked: false
+            })
         }),
         {
             // Key used in localStorage

@@ -24,25 +24,16 @@
 
 .subtitle {
     margin-top: -1.8rem;
-    font-size: 3rem;
+    font-size: 2.6rem;
     color: var(--color-light);
     text-align: center;
     max-width: 480px;
 }
 
-.rules {
-    display: flex;
-    flex-direction: column;
-    list-style: none;
-    color: var(--color-light);
-    font-size: 2rem;
-    text-align: center;
-    gap: 0.25rem;
-}
-
 .button {
     padding: 0.75rem 2.5rem;
     font-size: 2rem;
+    height: auto;
     background-color: var(--color-red);
     color: var(--color-light);
     border: none;
@@ -53,4 +44,44 @@
 
 .button:hover {
     background-color: var(--color-blue);
+}
+
+.rulesContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    width: 100%;
+    max-width: 750px;
+}
+
+.cardWide {
+    width: 100%;
+    background-color: #1e2640;
+    text-align: center;
+}
+
+.cardSmall {
+    background-color: #1e2640;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+}
+
+.cardText {
+    color: var(--color-light);
+    font-size: 1.5rem;
+}
+
+.grid {
+    width: 100%;
+}
+
+.badge {
+    font-size: 1.3rem;
+    height: 50px;
+    min-width: 70px;
+    border-color: transparent;
 }

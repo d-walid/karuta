@@ -19,7 +19,7 @@
 .card--selected {
     position: absolute;
     inset: 0;
-    background-color: rgba(255, 215, 0, 0.4);
+    background-color: rgba(0, 200, 0, 0.4);
     pointer-events: none;
 }
 
@@ -37,4 +37,6 @@
     pointer-events: none;
 }
 
-
+.placeholder {
+    height: 100%;
+}

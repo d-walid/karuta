@@ -9,6 +9,8 @@ import { useGameStore, shuffle } from "../stores/useGameStore";
 import { useAudio } from "../hooks/useAudio";
 import { useTimer } from "../hooks/useTimer";
 import GameBoard from "../components/GameBoard";
+import TimerBar from "../components/TimerBar";
+import { Badge, Slider } from "@mantine/core";
 
 import styles from './GamePage.module.css';
 
@@ -35,7 +37,7 @@ export default function GamePage() {
     const currentMusic = rounds[currentRoundIndex]?.music ?? null
 
     // Timer freeze during the music/round transition
-    const timeLeft = useTimer(started && !isTransitioning ? 30 : 0, handleExpire, currentRoundIndex)
+    const timeLeft = useTimer(started && !isTransitioning ? 300 : 0, handleExpire, currentRoundIndex)
 
     // Load data from Supabase on mount
     useEffect(() => {
@@ -46,12 +48,6 @@ export default function GamePage() {
             })
             .catch(err => setLoadError(err.message))
     }, []) 
-
-    const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-        const value = parseFloat(e.target.value)
-        setVolume(value)
-        Howler.volume(value)
-    }
 
     // Initialize a fresh game when the player clicks start
     const handleStart = () => {
@@ -102,13 +98,12 @@ export default function GamePage() {
                 <button 
                     className={styles.button}  
                     onClick={handleStart}
-                    disabled={allCards.length === 0}
-                >
+                    disabled={allCards.length === 0}>
                     {allCards.length === 0 ? 'Loading...' : 'Start the game'}
                 </button>
 
                 <div className={styles.info}>
-                    <span>Theme : Anime</span>
+                    <span>Theme: Anime</span>
                     <span>{ROUND_COUNT} musics - {ROUND_COUNT * 2} cards</span>
                 </div>
             </div>
@@ -117,27 +112,49 @@ export default function GamePage() {
 
     return (
         <div className={styles.page}>
-            <div className={styles.hud}>
-                <div className={styles.hudRow}>
-                    <span>Score: {score}</span>
-                    <span>|</span>
-                    <span>Errors: {errors}</span>
-                    <span>|</span>
-                    <span>Round: {isTransitioning ? currentRoundIndex : currentRoundIndex +1} / {rounds.length}</span>
-                    <span>|</span>
-                    <span>Remaining time: {timeLeft}s</span>
-                </div>
-                <div className={styles.hudRow}>
+            <div className={styles.volumeControl}>
                 <span>🔊</span>
-                <input
-                    type="range"
+                <Slider
                     min={0}
                     max={1}
                     step={0.01}
                     value={volume}
-                    onChange={handleVolumeChange}
+                    onChange={(value) => { setVolume(value); Howler.volume(value) }}
                     aria-label="Volume"
+                    label={null}
+                    classNames={{ root: styles.slider }}
                 />
+            </div>
+            
+            <div className={styles.hud}>
+                <div className={styles.hudRow}>
+                    <Badge
+                        variant="outline"
+                        color="var(--color-gold)"
+                        size="xl"
+                        classNames={{root: styles.badge}}>
+                        Score: {score}
+                    </Badge>
+
+                    <Badge
+                        variant="outline"
+                        color="var(--color-gold)"
+                        size="xl"
+                        classNames={{root: styles.badge}}>
+                        Errors: {errors}
+                    </Badge>
+
+                    <Badge
+                        variant="outline"
+                        color="var(--color-gold)"
+                        size="xl"
+                        classNames={{root: styles.badge}}>
+                        Round: {isTransitioning ? currentRoundIndex : currentRoundIndex +1}/{rounds.length}
+                    </Badge>                    
+                </div>
+                
+                <div className={styles.hudRow}>
+                <TimerBar timeLeft={timeLeft} duration={300} />
                 </div>
             </div>
             <GameBoard

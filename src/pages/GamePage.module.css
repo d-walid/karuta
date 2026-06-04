@@ -51,10 +51,26 @@
 .hudRow {
     display: flex;
     gap: 1rem;
+    align-items: center;
 }
 
-.hudRow input[type="range"] {
+.volumeControl {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-light);
+}
+
+.badge {
+    font-size: 1.2rem;
+    height: 50px;
+    width: auto;
+    border-color: transparent;
+}
+
+.slider {
     width: 200px;
-    accent-color: var(--color-gold);
 }
-

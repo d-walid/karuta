@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mantine/core": "^9.3.0",
+    "@mantine/hooks": "^9.3.0",
     "@supabase/supabase-js": "^2.106.2",
     "framer-motion": "^12.38.0",
     "howler": "^2.2.4",

@@ -1,4 +1,6 @@
 import { useNavigate } from "react-router-dom";
+import { Card, SimpleGrid, Text, Badge, Button  } from '@mantine/core';
+
 import styles from './MenuPage.module.css'
 
 
@@ -10,18 +12,40 @@ export default function MenuPage() {
             <header className={styles.header}>
                 <h1 className={styles.title}>Karuta</h1>
                 <p className={styles.subtitle}>Memory game with music</p>
-                <ul className={styles.rules}>
-                    <li>Two differents cards per music</li>
-                    <li>The round have 30sec length</li>
-                    <br />
-                    <li>1 good card found : 1 point</li>
-                    <li>1 bad card selected  : -1 point</li>
-                    <li>No cards found during the round : -2 points</li>
-                </ul>
             </header>
-            <button className={styles.button} onClick={() => navigate('/game/anime')}>
+
+            <div className={styles.rulesContainer}>
+                <Card classNames={{ root: styles.cardWide }}>
+                    <Text classNames={{ root: styles.cardText }}>
+                        Here are the rules of this game: <br /><br />
+
+                        - There is a music for each work from the theme<br />
+                        - Two different cards per music<br />
+                        - Each round lasts 30 seconds
+                    </Text>
+                </Card>
+                
+                <SimpleGrid cols={3} classNames={{ root: styles.grid }}>
+                    <Card classNames={{ root: styles.cardSmall}}>
+                        <Text classNames={{ root: styles.cardText }}>Good card found</Text>
+                        <Badge size="xl" color="green" classNames={{ root: styles.badge }}>+1</Badge>
+                    </Card>
+
+                    <Card classNames={{ root: styles.cardSmall}}>
+                        <Text classNames={{ root: styles.cardText }}>Wrong card found</Text>
+                        <Badge size="xl" color="red" classNames={{ root: styles.badge }}>-1</Badge>
+                    </Card>
+
+                    <Card classNames={{ root: styles.cardSmall}}>
+                        <Text classNames={{ root: styles.cardText }}>No card found</Text>
+                        <Badge size="xl" color="red" classNames={{ root: styles.badge }}>-2</Badge>
+                    </Card>
+                </SimpleGrid>
+            </div>
+
+            <Button classNames={{ root: styles.button}} onClick={() => navigate('/game/anime')}>
                 Anime
-            </button>
+            </Button>
         </div>
     )
 }

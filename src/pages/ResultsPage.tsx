@@ -2,27 +2,45 @@ import { useNavigate } from "react-router-dom";
 import { Howler } from 'howler'
 
 import { useGameStore } from "../stores/useGameStore";
+import { Badge, Button } from '@mantine/core';
 
 import styles from './ResultsPage.module.css'
 
 
 export default function ResultsPage() {
     const navigate = useNavigate()
-
-    const { score, errors, rounds } = useGameStore()
-
+    const { score, errors, rounds, resetGame } = useGameStore()
     const foundRounds = rounds.filter(r => r.status === 'success')
     const missedRounds = rounds.filter(r => r.status === 'timeout')
 
     return (
         <div className={styles.page}>
-            <h1 className={styles.title}>Game finished !</h1>
+            <h1 className={styles.title}>Game finished!</h1>
+
             <div className={styles.stats}>
-                <p>Score: {score}</p>
-                <span>|</span>
-                <p>Found pairs: {foundRounds.length} / {rounds.length}</p>
-                <span>|</span>
-                <p>Errors: {errors}</p>
+                <Badge
+                    variant="outline"
+                    color="var(--color-gold)"
+                    size="xl"
+                    classNames={{ root: styles.badge }}>
+                        Score: {score}
+                    </Badge>
+
+                <Badge
+                    variant="outline"
+                    color="var(--color-gold)"
+                    size="xl"
+                    classNames={{ root: styles.badge }}>
+                        Found pairs: {foundRounds.length}/{rounds.length}
+                    </Badge>
+
+                <Badge
+                    variant="outline"
+                    color="var(--color-gold)"
+                    size="xl"
+                    classNames={{ root: styles.badge }}>
+                        Errors: {errors}
+                    </Badge>
             </div>
 
             <div className={styles.lists}>
@@ -53,10 +71,12 @@ export default function ResultsPage() {
                 </div>
             </div>
 
-            <button className={styles.button}
-                onClick={() => { Howler.stop(); navigate('/') }}>
+            <Button
+                onClick={() => { Howler.stop(); resetGame(); navigate('/') }}
+                classNames={{ root: styles.button }}
+            >
                 Back to menu
-            </button>
+            </Button>
         </div>
     )
 }

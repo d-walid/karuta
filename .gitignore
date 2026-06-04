@@ -26,3 +26,7 @@ dist-ssr
 upload-assets.js
 public/audio/
 public/images/
+src/data/cards.json
+src/data/works.json
+src/data/musics.json
+src/data/index.ts
