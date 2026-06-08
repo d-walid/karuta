@@ -28,6 +28,24 @@
     background-color: var(--color-blue);
 }
 
+.nicknameInput {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--color-gold);
+    color: var(--color-light);
+    font-size: 1.7rem;
+    padding: 6px 4px;
+    text-align: center;
+    outline: none;
+    width: 220px;
+    margin-bottom: 10px;
+}
+
+.nicknameInput::placeholder {
+    color: white;
+    opacity: 0.5;
+}
+
 .info {
     display: flex;
     flex-direction: column;

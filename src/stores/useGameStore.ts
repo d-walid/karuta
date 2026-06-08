@@ -36,11 +36,16 @@ type GameStore = GameState & {
     shuffledCards: Card[]
     volume: number
     isLocked: boolean
+    nickname: string
+    startedAt: number | null
+    scoreSubmitted: boolean
     initGame: (cards: Card[], musics: Music[], theme: Theme) => void
     handleCardClick: (cardId: string) => void
     handleExpire: () => void
     setVolume: (value: number) => void
     setLocked: (value: boolean) => void
+    setNickname: (value: string) => void
+    setScoreSubmitted: () => void
     resetGame: () => void
 }
 
@@ -64,6 +69,9 @@ export const useGameStore = create<GameStore>()(
             shuffledCards: [],
             volume: 0.10,
             isLocked: false,
+            nickname: '',
+            startedAt: null,
+            scoreSubmitted: false,
 
             // Resets and initializes a new game
             initGame: (cards, musics, theme) => {
@@ -76,7 +84,9 @@ export const useGameStore = create<GameStore>()(
                     errors: 0,
                     cardStatuses: buildInitialStatuses(cards),
                     shuffledCards: shuffle(cards),
-                    isLocked: false
+                    isLocked: false,
+                    startedAt: Date.now(),
+                    scoreSubmitted: false,
                 })
             },
 
@@ -101,7 +111,7 @@ export const useGameStore = create<GameStore>()(
                         }))
                     }, 600)
                     set({
-                        score: prev.score - 1,
+                        score: Math.max(0, prev.score - 1),
                         errors: prev.errors + 1,
                         cardStatuses: {...prev.cardStatuses, [cardId]: 'wrong'}
                     })
@@ -113,7 +123,15 @@ export const useGameStore = create<GameStore>()(
                 // Both cards of the pair found: remove them and advance to next round
                 if (newFoundCardsIds.length === 2) {
                     const updatedStatuses = {...prev.cardStatuses}
-                    currentMusic.cardIds.forEach(id => {updatedStatuses[id] = 'removed'})
+                    currentMusic.cardIds.forEach(id => {updatedStatuses[id] = 'selected'})
+
+                    setTimeout(() => {
+                        set(current => {
+                            const afterRemove = {...current.cardStatuses}
+                            currentMusic.cardIds.forEach(id => { afterRemove[id] = 'removed'})
+                            return { cardStatuses: afterRemove }
+                        })
+                    }, 400)
 
                     const updatedRounds = [...prev.rounds]
                     updatedRounds[prev.currentRoundIndex] = {
@@ -154,17 +172,30 @@ export const useGameStore = create<GameStore>()(
                 const currentRound = prev.rounds[prev.currentRoundIndex]
                 const foundCount = currentRound.foundCardIds.length
 
+                // If the user gets only one good card, the other is selected as revealed (gold)
                 const updatedStatuses = {...prev.cardStatuses}
-                currentRound.music.cardIds.forEach(id => { updatedStatuses[id] = 'removed' })
+                currentRound.music.cardIds.forEach(id => {
+                    if (updatedStatuses[id] !== 'selected') {
+                        updatedStatuses[id] = 'revealed'
+                    }
+                })
+
+                // Letting the user see the missing card(s) before it disappears
+                setTimeout(() => {
+                    set(current => {
+                        const afterRemove = {...current.cardStatuses}
+                        currentRound.music.cardIds.forEach(id => { afterRemove[id] = 'removed'})
+                        return { cardStatuses: afterRemove }
+                    })
+                }, 1500)
 
                 const updatedRounds = [...prev.rounds]
                 updatedRounds[prev.currentRoundIndex] = {...currentRound, status: 'timeout'}
-
                 const isLastRound = prev.currentRoundIndex >= prev.rounds.length - 1
-                
+
                 set({
                     // -2 only if no card was found this round
-                    score: foundCount === 0 ? prev.score - 2 : prev.score,
+                    score: foundCount === 0 ? Math.max(0, prev.score - 2) : prev.score,
                     status: isLastRound ? 'finished' : 'playing',
                     currentRoundIndex: isLastRound ? prev.currentRoundIndex : prev.currentRoundIndex + 1,
                     cardStatuses: updatedStatuses,
@@ -175,6 +206,8 @@ export const useGameStore = create<GameStore>()(
             // Updates the global audio volume of the music
             setVolume: (value) => set({ volume: value }),
             setLocked: (value) => set({ isLocked: value }),
+            setNickname: (value) => set({ nickname: value }),
+            setScoreSubmitted: () => set({ scoreSubmitted: true }),
 
             resetGame: () => set({
                 status: 'idle',
@@ -184,14 +217,14 @@ export const useGameStore = create<GameStore>()(
                 errors: 0,
                 cardStatuses: {},
                 shuffledCards: [],
-                isLocked: false
+                isLocked: false,
             })
         }),
         {
             // Key used in localStorage
             name: 'karuta-game',
             // Only persist the volume - not the game state
-            partialize: (state) => ({ volume: state.volume }),
+            partialize: (state) => ({ volume: state.volume, nickname: state.nickname }),
         }
     )
 )

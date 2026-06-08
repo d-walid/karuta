@@ -2,6 +2,27 @@ import { supabase } from "../lib/supabase";
 import type { Work, Card, Music, Theme } from '../types';
 
 
+
+export type ScorePayload = {
+    nickname: string
+    score: number
+    errors: number
+    duration_ms: number
+    theme: string
+}
+
+
+export type LeaderboardEntry = {
+    id: string
+    nickname: string
+    score: number
+    errors: number
+    duration_ms: number
+    theme: string
+    played_at: string
+}
+
+
 export async function fetchWorks(): Promise<Work[]> {
     const { data, error } = await supabase.from('works').select('*');
 
@@ -41,4 +62,23 @@ export async function fetchMusics(): Promise<Music[]> {
         audioFile: row.audio_file as string,
         cardIds: row.card_ids as [string, string]
     }));
+}
+
+
+export async function submitScore(payload: ScorePayload): Promise<void> {
+    const { error } = await supabase.from('scores').insert(payload)
+    if (error) throw new Error(error.message)
+}
+
+
+export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
+    const { data, error } = await supabase
+        .from('scores')
+        .select('*')
+        .order('score', { ascending: false })
+        .order('duration_ms', { ascending: true})
+        .limit(10)
+
+    if (error) throw new Error(error.message)
+    return data as LeaderboardEntry[]
 }

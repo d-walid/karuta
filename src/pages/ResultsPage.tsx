@@ -1,17 +1,38 @@
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Howler } from 'howler'
 
 import { useGameStore } from "../stores/useGameStore";
-import { Badge, Button } from '@mantine/core';
+import { submitScore } from "../data/api";
+import { formatTime } from "../utils/formatTime";
 
+import { Badge, Button } from '@mantine/core';
 import styles from './ResultsPage.module.css'
+
 
 
 export default function ResultsPage() {
     const navigate = useNavigate()
-    const { score, errors, rounds, resetGame } = useGameStore()
+    const { score, errors, rounds, resetGame, startedAt, scoreSubmitted, setScoreSubmitted } = useGameStore()
     const foundRounds = rounds.filter(r => r.status === 'success')
     const missedRounds = rounds.filter(r => r.status === 'timeout')
+
+    // Defines the time used by the player to finish a game
+    const durationRef = useRef(startedAt ? Date.now() - startedAt : 0)
+    const duration = durationRef.current
+    const durationLabel = formatTime(duration)
+
+    // Submission of the score with the nickname in the database
+    const nickname = useGameStore(state => state.nickname)
+    const theme = useGameStore(state => state.theme)
+
+    useEffect(() => {
+        if (scoreSubmitted) return
+        setScoreSubmitted()
+        submitScore({
+            nickname, score, errors, duration_ms: duration, theme
+        }).catch(err => console.error('Failed to submit score:', err))
+    }, [])
 
     return (
         <div className={styles.page}>
@@ -23,24 +44,32 @@ export default function ResultsPage() {
                     color="var(--color-gold)"
                     size="xl"
                     classNames={{ root: styles.badge }}>
-                        Score: {score}
-                    </Badge>
+                    Score: {score}
+                </Badge>
 
                 <Badge
                     variant="outline"
                     color="var(--color-gold)"
                     size="xl"
                     classNames={{ root: styles.badge }}>
-                        Found pairs: {foundRounds.length}/{rounds.length}
-                    </Badge>
+                    Found pairs: {foundRounds.length}/{rounds.length}
+                </Badge>
 
                 <Badge
                     variant="outline"
                     color="var(--color-gold)"
                     size="xl"
                     classNames={{ root: styles.badge }}>
-                        Errors: {errors}
-                    </Badge>
+                    Errors: {errors}
+                </Badge>
+
+                <Badge
+                    variant="outline"
+                    color="var(--color-gold)"
+                    size="xl"
+                    classNames={{ root: styles.badge }}>
+                    Time: {durationLabel}
+                </Badge>
             </div>
 
             <div className={styles.lists}>

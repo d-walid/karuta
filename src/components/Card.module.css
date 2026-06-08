@@ -37,6 +37,13 @@
     pointer-events: none;
 }
 
+.card--revealed {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(210, 191, 85, 0.6);
+    pointer-events: none;
+}
+
 .placeholder {
     height: 100%;
 }

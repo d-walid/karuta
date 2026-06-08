@@ -30,7 +30,7 @@ export type Music = {
 
 
 // State of a card during the game
-export type CardStatus = 'idle' | 'selected' | 'matched' | 'removed' | 'wrong'
+export type CardStatus = 'idle' | 'selected' | 'matched' | 'removed' | 'wrong' | 'revealed'
 
 
 // A round

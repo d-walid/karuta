@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Howler } from 'howler';
 
 import { fetchCards, fetchMusics } from '../data/api';
+import { formatTimeLive } from "../utils/formatTime";
 import type { Card, Music } from '../types';
 
 import { useGameStore, shuffle } from "../stores/useGameStore";
@@ -11,6 +12,7 @@ import { useTimer } from "../hooks/useTimer";
 import GameBoard from "../components/GameBoard";
 import TimerBar from "../components/TimerBar";
 import { Badge, Slider } from "@mantine/core";
+
 
 import styles from './GamePage.module.css';
 
@@ -24,13 +26,15 @@ export default function GamePage() {
     const [allCards, setAllCards] = useState<Card[]>([])
     const [allMusics, setAllMusics] = useState<Music[]>([])
     const [loadError, setLoadError] = useState<string | null>(null)
+    const [elapsedMs, setElapsedMs] = useState(0)
     
 
     // Read state and actions from the Zustand store
     const {
         status, score, errors, cardStatuses, shuffledCards,
-        currentRoundIndex, rounds, volume, 
-        initGame, handleCardClick, handleExpire, setVolume, setLocked
+        currentRoundIndex, rounds, volume, nickname, startedAt,
+        initGame, handleCardClick, handleExpire, setVolume, 
+        setLocked, setNickname
     } = useGameStore()
 
     const { play, stop } = useAudio()
@@ -82,6 +86,15 @@ export default function GamePage() {
     // Apply the persisted volume on mount
     useEffect(() => { Howler.volume(volume) }, [])
 
+    // Realtime timer for the user once the game is launched
+    useEffect(() => {
+        if (!started || !startedAt) return
+        const interval = setInterval(() => {
+            setElapsedMs(Date.now() - startedAt)
+        }, 10)
+        return () => clearInterval(interval)
+    }, [started, startedAt])
+
     // Navigate to results when the game is finished
     useEffect(() => { if (status === 'finished') navigate('/results')}, [status])
 
@@ -95,10 +108,19 @@ export default function GamePage() {
     if (!started) {
         return (
             <div className={styles.lobby}>
+                <input
+                    className={styles.nicknameInput}
+                    type="text"
+                    placeholder="Your nickname"
+                    value={nickname}
+                    onChange={(e) => setNickname(e.target.value)}
+                    maxLength={20}
+                />
+
                 <button 
                     className={styles.button}  
                     onClick={handleStart}
-                    disabled={allCards.length === 0}>
+                    disabled={allCards.length === 0 || nickname.trim() === ''}>
                     {allCards.length === 0 ? 'Loading...' : 'Start the game'}
                 </button>
 
@@ -150,7 +172,15 @@ export default function GamePage() {
                         size="xl"
                         classNames={{root: styles.badge}}>
                         Round: {isTransitioning ? currentRoundIndex : currentRoundIndex +1}/{rounds.length}
-                    </Badge>                    
+                    </Badge>
+                    
+                    <Badge
+                        variant="outline"
+                        color="var(--color-gold)"
+                        size="xl"
+                        classNames={{root: styles.badge}}>
+                        Time: {formatTimeLive(elapsedMs)}
+                    </Badge>               
                 </div>
                 
                 <div className={styles.hudRow}>
