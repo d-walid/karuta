@@ -3,6 +3,17 @@ import { persist } from 'zustand/middleware'
 import type { Card, Music, CardStatus, GameState, Theme } from '../types'
 
 
+// Scoring constants
+export const SCORE_NORMAL = 1
+export const SCORE_COMBO = 2
+export const SCORE_WRONG = -1
+export const SCORE_TIMEOUT = -2
+export const SCORE_MIN = 0
+export const COMBO_THRESHOLD = 3
+export const SPEED_BONUS_THRESHOLD_SECONDS = 5
+export const SPEED_BONUS = 1
+
+
 // shuffles an array randomly (Fisher-Yates algorithm)
 export function shuffle<T>(array: T[]): T[] {
     const result = [...array]
@@ -39,6 +50,7 @@ type GameStore = GameState & {
     nickname: string
     startedAt: number | null
     scoreSubmitted: boolean
+    setRoundStartedAt: (value: number) => void
     initGame: (cards: Card[], musics: Music[], theme: Theme) => void
     handleCardClick: (cardId: string) => void
     handleExpire: () => void
@@ -72,6 +84,9 @@ export const useGameStore = create<GameStore>()(
             nickname: '',
             startedAt: null,
             scoreSubmitted: false,
+            comboCount: 0,
+            maxCombo: 0,
+            roundStartedAt: null,
 
             // Resets and initializes a new game
             initGame: (cards, musics, theme) => {
@@ -87,6 +102,9 @@ export const useGameStore = create<GameStore>()(
                     isLocked: false,
                     startedAt: Date.now(),
                     scoreSubmitted: false,
+                    comboCount: 0,
+                    maxCombo: 0,
+                    roundStartedAt: null,
                 })
             },
 
@@ -110,10 +128,12 @@ export const useGameStore = create<GameStore>()(
                             cardStatuses: {...current.cardStatuses, [cardId]: 'idle'}
                         }))
                     }, 600)
+
                     set({
-                        score: Math.max(0, prev.score - 1),
+                        score: Math.max(SCORE_MIN, prev.score + SCORE_WRONG),
                         errors: prev.errors + 1,
-                        cardStatuses: {...prev.cardStatuses, [cardId]: 'wrong'}
+                        cardStatuses: {...prev.cardStatuses, [cardId]: 'wrong'},
+                        comboCount: 0
                     })
                     return
                 }
@@ -122,8 +142,8 @@ export const useGameStore = create<GameStore>()(
 
                 // Both cards of the pair found: remove them and advance to next round
                 if (newFoundCardsIds.length === 2) {
-                    const updatedStatuses = {...prev.cardStatuses}
-                    currentMusic.cardIds.forEach(id => {updatedStatuses[id] = 'selected'})
+                    const updatedStatuses  = {...prev.cardStatuses}
+                    currentMusic.cardIds.forEach(id => { updatedStatuses[id] = 'selected'})
 
                     setTimeout(() => {
                         set(current => {
@@ -133,34 +153,55 @@ export const useGameStore = create<GameStore>()(
                         })
                     }, 400)
 
+                    const newCombo = prev.comboCount + 1
+                    const inCombo = newCombo >= COMBO_THRESHOLD
+                    const pointsPerCard = inCombo ? SCORE_COMBO : SCORE_NORMAL
+
+                    const elapsedSeconds = prev.roundStartedAt
+                        ? (Date.now() - prev.roundStartedAt) / 1000
+                        : Infinity
+                    const speedBonus = elapsedSeconds <= SPEED_BONUS_THRESHOLD_SECONDS ? SPEED_BONUS : 0
+
+                    const pairPoints = pointsPerCard + speedBonus
+                    const newScore = Math.max(SCORE_MIN, prev.score + pairPoints)
+                    const newMaxCombo = Math.max(prev.maxCombo, newCombo)
+
                     const updatedRounds = [...prev.rounds]
                     updatedRounds[prev.currentRoundIndex] = {
                         ...currentRound,
                         foundCardIds: newFoundCardsIds,
-                        status: 'success'
+                        status: 'success' as const
                     }
 
                     const isLastRound = prev.currentRoundIndex >= prev.rounds.length - 1
                     set({
-                        score: prev.score + 1,
+                        score: newScore,
                         status: isLastRound ? 'finished' : 'playing',
                         currentRoundIndex: isLastRound ? prev.currentRoundIndex : prev.currentRoundIndex + 1,
                         cardStatuses: updatedStatuses,
                         rounds: updatedRounds,
-                        isLocked: true
+                        isLocked: true,
+                        comboCount: newCombo,
+                        maxCombo: newMaxCombo,
+                        roundStartedAt: null
                     })
                     return
                 }
 
-                // First card of the pair: mark as 'selected' and award +1
+                // First card of the pair: mark as 'selected' and award points (+ speed bonus)
                 const updatedRounds = [...prev.rounds]
                 updatedRounds[prev.currentRoundIndex] = {
                     ...currentRound,
                     foundCardIds: newFoundCardsIds
                 }
 
+                const elapsedSecondsFirst = prev.roundStartedAt
+                    ? (Date.now() - prev.roundStartedAt) / 1000
+                    : Infinity
+                const speedBonusFirst = elapsedSecondsFirst <= SPEED_BONUS_THRESHOLD_SECONDS ? SPEED_BONUS : 0
+
                 set({
-                    score: prev.score + 1,
+                    score: Math.max(SCORE_MIN, prev.score + SCORE_NORMAL + speedBonusFirst),
                     cardStatuses: {...prev.cardStatuses, [cardId]: 'selected'},
                     rounds: updatedRounds
                 })
@@ -195,11 +236,13 @@ export const useGameStore = create<GameStore>()(
 
                 set({
                     // -2 only if no card was found this round
-                    score: foundCount === 0 ? Math.max(0, prev.score - 2) : prev.score,
+                    score: foundCount === 0 ? Math.max(SCORE_MIN, prev.score + SCORE_TIMEOUT) : prev.score,
                     status: isLastRound ? 'finished' : 'playing',
                     currentRoundIndex: isLastRound ? prev.currentRoundIndex : prev.currentRoundIndex + 1,
                     cardStatuses: updatedStatuses,
-                    rounds: updatedRounds
+                    rounds: updatedRounds,
+                    comboCount: 0,
+                    roundStartedAt: null,
                 })
             },
 
@@ -208,6 +251,7 @@ export const useGameStore = create<GameStore>()(
             setLocked: (value) => set({ isLocked: value }),
             setNickname: (value) => set({ nickname: value }),
             setScoreSubmitted: () => set({ scoreSubmitted: true }),
+            setRoundStartedAt: (value) => set({ roundStartedAt: value }),
 
             resetGame: () => set({
                 status: 'idle',
@@ -218,6 +262,9 @@ export const useGameStore = create<GameStore>()(
                 cardStatuses: {},
                 shuffledCards: [],
                 isLocked: false,
+                comboCount: 0,
+                maxCombo: 0,
+                roundStartedAt: null,
             })
         }),
         {

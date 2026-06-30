@@ -1,5 +1,5 @@
 // Available themes
-export type Theme = 'anime'
+export type Theme = 'anime' | 'movie'
 
 
 // A Work
@@ -49,6 +49,9 @@ export type GameState = {
     currentRoundIndex: number
     score: number
     errors: number
+    comboCount: number
+    maxCombo: number
+    roundStartedAt: number | null
     cardStatuses: Record<string, CardStatus>
 }
 

@@ -13,7 +13,8 @@ import styles from './ResultsPage.module.css'
 
 export default function ResultsPage() {
     const navigate = useNavigate()
-    const { score, errors, rounds, resetGame, startedAt, scoreSubmitted, setScoreSubmitted } = useGameStore()
+    const { score, errors, rounds, maxCombo,
+            resetGame, startedAt, scoreSubmitted, setScoreSubmitted } = useGameStore()
     const foundRounds = rounds.filter(r => r.status === 'success')
     const missedRounds = rounds.filter(r => r.status === 'timeout')
 
@@ -61,6 +62,14 @@ export default function ResultsPage() {
                     size="xl"
                     classNames={{ root: styles.badge }}>
                     Errors: {errors}
+                </Badge>
+
+                <Badge
+                    variant="outline"
+                    color="var(--color-gold)"
+                    size="xl"
+                    classNames={{ root: styles.badge }}>
+                    Best combo: {maxCombo}
                 </Badge>
 
                 <Badge

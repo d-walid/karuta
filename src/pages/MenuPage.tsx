@@ -33,18 +33,20 @@ export default function MenuPage() {
 
                                 - There is a music for each work from the theme<br />
                                 - Two different cards per music<br />
-                                - Each round lasts 30 seconds
+                                - Each round lasts 30 seconds<br />
+                                - Find a car within 5 seconds for a speed bonus<br />
+                                - 3 pairs in a row and trigger combo mode !
                             </Text>
                         </Card>
 
                         <SimpleGrid cols={3} classNames={{ root: styles.grid }}>
                             <Card classNames={{ root: styles.cardSmall }}>
-                                <Text classNames={{ root: styles.cardText }}>Good card found</Text>
-                                <Badge size="xl" color="green" classNames={{ root: styles.badge }}>+1</Badge>
+                                <Text classNames={{ root: styles.cardText }}>Correct card</Text>
+                                <Badge size="xl" color="green" classNames={{ root: styles.badge }}>+1 to +3</Badge>
                             </Card>
 
                             <Card classNames={{ root: styles.cardSmall }}>
-                                <Text classNames={{ root: styles.cardText }}>Wrong card found</Text>
+                                <Text classNames={{ root: styles.cardText }}>Wrong card</Text>
                                 <Badge size="xl" color="red" classNames={{ root: styles.badge }}>-1</Badge>
                             </Card>
 
@@ -88,9 +90,14 @@ export default function MenuPage() {
                 </div>
             </div>
 
-            <Button classNames={{ root: styles.button }} onClick={() => navigate('/game/anime')}>
-                Anime
-            </Button>
+            <div className={styles.themeButtons}>
+                <Button classNames={{ root: styles.button }} onClick={() => navigate('/game/anime')}>
+                    Anime
+                </Button>
+                <Button classNames={{ root: styles.button }} onClick={() => navigate('/game/movie')}>
+                    Movie
+                </Button>
+            </div>
         </div>
     )
 }

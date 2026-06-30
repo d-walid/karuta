@@ -7,11 +7,12 @@ import styles from './GameBoard.module.css'
 type Props = {
     cards: Card[] // all cards to display
     cardStatuses: Record<string, CardStatus> // status of each card by id
+    cardPoints: Record<string, number | null>
     onCardClick: (cardId: string) => void // called when a card is clicked
 }
 
 
-export default function GameBoard({ cards, cardStatuses, onCardClick }: Props) {
+export default function GameBoard({ cards, cardStatuses, cardPoints, onCardClick }: Props) {
     return (
         <div className={styles.grid}>
             {cards.map(card => (
@@ -19,6 +20,7 @@ export default function GameBoard({ cards, cardStatuses, onCardClick }: Props) {
                     key={card.id}
                     card={card}
                     status={cardStatuses[card.id] ?? 'idle'}
+                    points={cardPoints[card.id] ?? null}
                     onClick={() => onCardClick(card.id)}
                 />
             ))}

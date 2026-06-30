@@ -18,19 +18,16 @@ export function useTimer(duration: number, onExpire: () => void, roundIndex: num
         // Reset the timer each time duration changes (= new round starts)
         setTimeLeft(duration)
 
-        // setInterval calls the callback every 16ms (~60fps)
-        const TICK = 16
-        const decrement = duration * TICK / 30000
+        const TICK = 100
         const interval = setInterval(() => {
             setTimeLeft(prev => {
-                if (prev <= decrement) {
+                if (prev <= TICK) {
                     // Time is up: stop the interval and notify the parent
                     clearInterval(interval)
-                    onExpireRef.current()
+                    setTimeout(() => onExpireRef.current(), 0)
                     return 0
                 }
-                // Decrement proportionally each tick for smooth animation
-                return prev - decrement
+                return prev - TICK
             })
         }, TICK)
 

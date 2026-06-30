@@ -8,6 +8,7 @@ type Props = {
     card: Card // the card data (id, imageFile, label...)
     status: CardStatus // current state
     onClick: () => void // function called when the card is clicked
+    points?: number | null
 }
 
 
@@ -24,7 +25,7 @@ const shakeVariants = {
 
 
 // Destructure props directly in the signature, typed with Props
-export default function Card({ card, status, onClick }: Props) {
+export default function Card({ card, status, onClick, points = null }: Props) {
     return (
         <div className={styles.placeholder}>
             <AnimatePresence>
@@ -40,6 +41,23 @@ export default function Card({ card, status, onClick }: Props) {
                     >
                         <img src={card.imageFile} alt={card.label} />
                         <div className={styles[`card--${status}`]} />
+                        <AnimatePresence>
+                            {points !== null && (
+                                <motion.div
+                                    key={`points-${points}`}
+                                    className={styles.pointsPopup}
+                                    initial={{ opacity: 0, y: 0 }}
+                                    animate={{ opacity: 1, y: -15 }}
+                                    exit={{ opacity: 0, y: -30 }}
+                                    transition={{ duration: 0.6, ease: 'easeOut'}}
+                                    style={{
+                                        color: points > 0 ? 'rgb(255, 255, 255)' : 'rgb(178, 58, 72)'
+                                    }}
+                                >
+                                    {points > 0 ? `+${points}` : points}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </motion.div>
                 )}
             </AnimatePresence>

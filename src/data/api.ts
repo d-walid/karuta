@@ -36,8 +36,11 @@ export async function fetchWorks(): Promise<Work[]> {
 }
 
 
-export async function fetchCards(): Promise<Card[]> {
-    const { data, error } = await supabase.from('cards').select('*');
+export async function fetchCards(theme: Theme): Promise<Card[]> {
+    const { data, error } = await supabase
+        .from('cards')
+        .select('*, works!inner(theme)')
+        .eq('works.theme', theme);
 
     if (error) throw new Error(`fetchCards: ${error.message}`);
 
@@ -50,8 +53,11 @@ export async function fetchCards(): Promise<Card[]> {
 }
 
 
-export async function fetchMusics(): Promise<Music[]> {
-    const { data, error } = await supabase.from('musics').select('*');
+export async function fetchMusics(theme: Theme): Promise<Music[]> {
+    const { data, error } = await supabase
+        .from('musics')
+        .select('*, works!inner(theme)')
+        .eq('works.theme', theme);
 
     if (error) throw new Error(`fetchMusics: ${error.message}`);
 

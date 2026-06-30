@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.4.0]
+
+**New theme**
+- Movie theme added — 48 films, selectable from the home page alongside Anime
+
+**Gameplay**
+- Combo system: 2 points per card instead of 1 once 3 consecutive pairs are found without error
+- Speed bonus: +1 point per card if found within 5 seconds of the music starting (stacks with combo)
+- Score floor enforced at 0 across all scoring paths
+
+**UI**
+- Points popup (+N / -N) fades in on each card click to show exactly what was earned
+- HUD redesigned: icons and distinct colors per badge (Score, Errors, Round, Time)
+- Combo badge pulses while active, with its own accent color
+- Home page rules updated to reflect combo and speed bonus scoring
+
+**Bug fixes**
+- Fixed React "setState during render" warning from the round timer
+- Fixed found pair card not flashing green when it completed the match
+
+---
 
 ## [0.3.0]
 

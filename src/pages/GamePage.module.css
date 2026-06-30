@@ -84,9 +84,30 @@
 
 .badge {
     font-size: 1.2rem;
+    font-weight: 700;
     height: 50px;
     width: auto;
     border-color: transparent;
+}
+
+.badgeScore {
+    background-color: rgba(210, 191, 85, 0.15) !important;
+    color: #f0d978 !important;
+}
+
+.badgeErrors {
+    background-color: rgba(178, 58, 72, 0.15) !important;
+    color: #ff8a98 !important;
+}
+
+.badgeRound {
+    background-color: rgba(86, 142, 163, 0.15) !important;
+    color: #8fd4f5 !important;
+}
+
+.badgeTime {
+    background-color: rgba(243, 232, 238, 0.1) !important;
+    color: #ffffff !important;
 }
 
 .slider {

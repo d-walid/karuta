@@ -12,8 +12,8 @@ export default function TimerBar({ timeLeft, duration }: Props): React.ReactElem
     const percentage = (timeLeft / duration) * 100
 
     const colorClass = 
-        timeLeft > 200 ? styles.green :
-        timeLeft > 100 ? styles.orange :
+        timeLeft > 20000 ? styles.green :
+        timeLeft > 10000 ? styles.orange :
         styles.red
 
     return (
