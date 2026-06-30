@@ -66,6 +66,7 @@ export default function MenuPage() {
                                     <Table.Tr>
                                         <Table.Th>#</Table.Th>
                                         <Table.Th>Nickname</Table.Th>
+                                        <Table.Th>Theme</Table.Th>
                                         <Table.Th>Score</Table.Th>
                                         <Table.Th>Time</Table.Th>
                                         <Table.Th>Errors</Table.Th>
@@ -78,6 +79,7 @@ export default function MenuPage() {
                                             <Table.Tr key={entry.id}>
                                                 <Table.Td>{index + 1}</Table.Td>
                                                 <Table.Td>{entry.nickname}</Table.Td>
+                                                <Table.Td>{entry.theme}</Table.Td>
                                                 <Table.Td>{entry.score}</Table.Td>
                                                 <Table.Td>{time}</Table.Td>
                                                 <Table.Td>{entry.errors}</Table.Td>
